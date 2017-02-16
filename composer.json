@@ -1,0 +1,23 @@
+{
+    "extra": {
+        "isKitrixPlugin": true
+    },
+    "name": "kitrix/config",
+    "description": "Provide unified interface API to work with Kitrix config",
+    "type": "library",
+    "license": "MIT",
+    "version": "0.1.0",
+    "authors": [
+        {
+            "name": "Fe3dback",
+            "email": "fe3dback@yandex.ru"
+        }
+    ],
+    "autoload": {
+        "psr-4": {"Kitrix\\Config\\": "src/"}
+    },
+    "minimum-stability": "dev",
+    "require": {
+        "kitrix/core": "*"
+    }
+}
