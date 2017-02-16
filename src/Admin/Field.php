@@ -16,12 +16,37 @@ class Field
 
     function __construct(FieldType $type, $groupId, $id)
     {
+        $this->type = $type;
         $this->groupId = $groupId;
         $this->id = $id;
     }
 
-    final public function render() {
-        $this->type->render($this);
+    /**
+     * Render automatic replace this variables in html:
+     * {id} - id for field (can be used in field,label,etc..)
+     * {name} - system name for field
+     * {title} - title for field
+     *
+     * @return FieldRepresentation
+     */
+    final public function render($dbValue) {
+
+        $value = $this->type->unserialize($dbValue);
+        $htmlWidget = $this->type->renderWidget($value);
+        $htmlLabel = $this->type->renderLabel();
+
+        $inputId = "ktrx_config_" .$this->getGroupId() . "_" . $this->getId();
+
+        $template = [
+            "{id}" => $inputId,
+            "{name}" => $inputId,
+            "{title}" => $this->getTitle()
+        ];
+
+        $htmlWidget = str_replace(array_keys($template), array_values($template), $htmlWidget);
+        $htmlLabel = str_replace(array_keys($template), array_values($template), $htmlLabel);
+
+        return new FieldRepresentation($htmlWidget, $htmlLabel);
     }
 
     /**

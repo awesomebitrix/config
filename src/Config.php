@@ -1,7 +1,9 @@
 <?php namespace Kitrix\Config;
 
+use Kitrix\Common\Kitx;
 use Kitrix\Config\Admin\Field;
 use Kitrix\Config\Admin\FieldType;
+use Kitrix\Config\Fields\Checkbox;
 use Kitrix\Config\Fields\Input;
 use Kitrix\Entities\Admin\Route;
 use Kitrix\Plugins\Plugin;
@@ -51,15 +53,42 @@ class Config extends Plugin
         return $field;
     }
 
+    /**
+     * Return all fields by group and id
+     * @return mixed
+     */
+    public function getRegisteredFields()
+    {
+        return $this->registeredFields;
+    }
+
+    /**
+     * Return all groups
+     * @return mixed
+     */
+    public function getRegisteredGroups()
+    {
+        return $this->registeredGroups;
+    }
+
     public function run()
     {
-        $coreGroup = $this->addConfigGroup('Основные настройки');
-        if ($coreGroup) {
+        if (false !== $coreGroup = $this->addConfigGroup('Основные настройки')) {
 
             $this
                 ->addConfigField($coreGroup, new Input())
                 ->setTitle("Пример поля");
 
+            $this
+                ->addConfigField($coreGroup, new Checkbox())
+                ->setTitle("Использовать энергию молодости и хардкора?");
+        }
+
+        if (false !== $coreGroup2 = $this->addConfigGroup('Еще одни настройки')) {
+
+            $this
+                ->addConfigField($coreGroup2, new Input())
+                ->setTitle("Очередное поле");
         }
     }
 
@@ -71,7 +100,7 @@ class Config extends Plugin
 
             $tmp = new Route('/edit/{id}', [
                 '_controller' => "ConfigGroup",
-                'id' => $groupId
+                'id' => (int)$groupId
             ]);
             $tmp
                 ->setTitle($title)
@@ -81,15 +110,4 @@ class Config extends Plugin
 
         return $configRoutes;
     }
-
-    public function useAlias()
-    {
-        return "Конфигуратор";
-    }
-
-    public function useIcon()
-    {
-        return "fa-cogs";
-    }
-
 }
