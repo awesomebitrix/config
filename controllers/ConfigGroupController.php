@@ -1,8 +1,8 @@
 <?php namespace Kitrix\Config;
 
-use Kitrix\Entities\Admin\KitrixController;
+use Kitrix\Entities\Admin\Controller;
 
-class ConfigGroupController extends KitrixController
+class ConfigGroupController extends Controller
 {
 
     public function index($id) {
