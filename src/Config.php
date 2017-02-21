@@ -1,14 +1,13 @@
 <?php namespace Kitrix\Config;
 
-use Kitrix\Common\Kitx;
 use Kitrix\Config\Admin\Field;
 use Kitrix\Config\Admin\FieldType;
 use Kitrix\Config\Fields\Checkbox;
 use Kitrix\Config\Fields\Input;
-use Kitrix\Entities\Admin\Route;
+use Kitrix\MVC\Admin\RouteFactory;
 use Kitrix\Plugins\Plugin;
 
-class Config extends Plugin
+final class Config extends Plugin
 {
     private $_autoIncGroupId;
     private $_autoIncFieldId;
@@ -98,14 +97,11 @@ class Config extends Plugin
 
         foreach ($this->registeredGroups as $groupId => $title) {
 
-            $tmp = new Route('/edit/{id}', [
-                '_controller' => "ConfigGroup",
+            $configRoutes[] = RouteFactory::makeRoute('/edit/{id}', ConfigGroupController::class, "edit", [
                 'id' => (int)$groupId
-            ]);
-            $tmp
+            ])
                 ->setTitle($title)
                 ->setIcon('fa-cog');
-            $configRoutes[] = $tmp;
         }
 
         return $configRoutes;

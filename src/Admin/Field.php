@@ -1,6 +1,6 @@
 <?php namespace Kitrix\Config\Admin;
 
-class Field
+final class Field
 {
     /** @var FieldType */
     private $type;

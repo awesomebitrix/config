@@ -2,7 +2,7 @@
 
 use Kitrix\Config\Admin\FieldType;
 
-class Input extends FieldType
+final class Input extends FieldType
 {
     public function serialize($value)
     {

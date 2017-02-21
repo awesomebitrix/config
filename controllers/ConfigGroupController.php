@@ -1,11 +1,11 @@
 <?php namespace Kitrix\Config;
 
-use Kitrix\Entities\Admin\Controller;
+use Kitrix\MVC\Admin\Controller;
 
 class ConfigGroupController extends Controller
 {
 
-    public function index($id) {
+    public function edit($id) {
 
         /** @var Config $plug */
         $plug = $this->getContext()->getCurrentPlugin();

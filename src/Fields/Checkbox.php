@@ -2,7 +2,7 @@
 
 use Kitrix\Config\Admin\FieldType;
 
-class Checkbox extends FieldType
+final class Checkbox extends FieldType
 {
     public function serialize($value)
     {

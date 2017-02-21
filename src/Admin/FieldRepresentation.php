@@ -1,6 +1,6 @@
 <?php namespace Kitrix\Config\Admin;
 
-class FieldRepresentation
+final class FieldRepresentation
 {
     /** @var string */
     private $widget = "";
