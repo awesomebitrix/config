@@ -104,6 +104,10 @@ final class Config extends Plugin
                 ->setIcon('fa-cog');
         }
 
+        $configRoutes[] = RouteFactory::makeRoute('/list/', SiteConfigController::class, 'configList')
+            ->setTitle('Собственные настройки сайта')
+            ->setIcon('fa-tags');
+
         return $configRoutes;
     }
 }
