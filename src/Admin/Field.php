@@ -11,6 +11,9 @@ final class Field
     /** @var string */
     private $title = "Default input";
 
+    /** @var mixed */
+    private $defaultValue = 0;
+
     function __construct(FieldType $type, $code)
     {
         $this->type = $type;
@@ -32,7 +35,7 @@ final class Field
         $htmlWidget = $this->type->renderWidget($value);
         $htmlLabel = $this->type->renderLabel();
 
-        $inputId = "ktrx_config_" .$this->getPluginId() . "_" . $this->getCode();
+        $inputId = "ktrx" . "_" . $this->getCode();
 
         $template = [
             "{id}" => $inputId,
@@ -47,9 +50,9 @@ final class Field
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getCode(): int
+    public function getCode(): string
     {
         return $this->code;
     }
@@ -71,12 +74,30 @@ final class Field
     }
 
     /**
+     * @return mixed
+     */
+    public function getDefaultValue()
+    {
+        return $this->defaultValue;
+    }
+
+    /**
      * @param string $title
      * @return $this
      */
     public function setTitle(string $title)
     {
         $this->title = $title;
+        return $this;
+    }
+
+    /**
+     * @param mixed $defaultValue
+     * @return $this
+     */
+    public function setDefaultValue($defaultValue)
+    {
+        $this->defaultValue = $defaultValue;
         return $this;
     }
 }

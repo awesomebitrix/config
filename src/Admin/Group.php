@@ -1,7 +1,6 @@
 <?php namespace Kitrix\Config\Admin;
 
 use Kitrix\Common\Kitx;
-use Kitrix\Plugins\PluginsManager;
 
 class Group
 {

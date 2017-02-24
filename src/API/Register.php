@@ -5,6 +5,7 @@ use Kitrix\Common\SingletonClass;
 use Kitrix\Config\Admin\Field;
 use Kitrix\Config\Admin\FieldType;
 use Kitrix\Config\Admin\Group;
+use Kitrix\Config\ORM\ValuesTable;
 
 class Register
 {
@@ -17,6 +18,9 @@ class Register
 
     /** @var Group[] */
     private $groups = [];
+
+    /** @var array  */
+    private $_fieldsCache = [];
 
     protected function init()
     {
@@ -34,7 +38,30 @@ class Register
      */
     public function registerGroup(Group $group)
     {
-        $this->groups[] = $group;
+        $dbCurrentStamp = $this->loadFields();
+
+        // register fields in DB with default values
+        foreach ($group->getFields() as $field) {
+
+            // if field already in DB, skip
+            $uniqId = $this->getUniqueIdFromField($group, $field);
+            if (in_array($uniqId, array_keys($dbCurrentStamp))) {
+                continue;
+            }
+
+            // and field to database
+            ValuesTable::add([
+                ValuesTable::UNIQUE_ID => $uniqId,
+                ValuesTable::CODE => $field->getCode(),
+                ValuesTable::PID => $group->getGroupId(),
+                ValuesTable::VALUE => $field->getDefaultValue(),
+                ValuesTable::DEFAULT => $field->getDefaultValue()
+            ]);
+        }
+
+        // register group
+        $this->groups[$group->getGroupId()] = $group;
+
         return $this;
     }
 
@@ -108,5 +135,37 @@ class Register
     public function getGroups(): array
     {
         return $this->groups;
+    }
+
+    /**
+     * Return field values from DB
+     *
+     * @return array
+     */
+    public function loadFields(): array
+    {
+        if (!count($this->_fieldsCache))
+        {
+            $fields = ValuesTable::getList();
+
+            while ($f = $fields->fetch())
+            {
+                $this->_fieldsCache[$f[ValuesTable::UNIQUE_ID]] = $f;
+            }
+        }
+
+        return $this->_fieldsCache;
+    }
+
+    /**
+     * Get unique field identifier
+     *
+     * @param Group $g
+     * @param Field $f
+     * @return string
+     */
+    public function getUniqueIdFromField(Group $g, Field $f)
+    {
+        return sha1($g->getGroupId() . $f->getCode());
     }
 }

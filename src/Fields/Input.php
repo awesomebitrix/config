@@ -6,11 +6,11 @@ final class Input extends FieldType
 {
     public function serialize($value)
     {
-        return $value/2;
+        return $value;
     }
 
     public function unserialize($value)
     {
-        return $value*2;
+        return $value;
     }
 }

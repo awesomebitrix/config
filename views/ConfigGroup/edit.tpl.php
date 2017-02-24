@@ -1,32 +1,27 @@
 <?
 /**
- * @var string $group
- * @var \Kitrix\Config\Admin\Field[] $fields
+ * @var array $result
  */
+
+$title = $result['title'];
+/** @var \Kitrix\Config\Admin\FieldRepresentation[] $widgets */
+$widgets = $result['widgets'];
+
 ?>
 
-<?if(!$group):?>
-
-    Нет такой группы настроек :(
-    <?return;?>
-<?endif;?>
-
-<?if(count($fields)):?>
+<?if(count($widgets)):?>
 
     <div class="adm-detail-content">
 
         <div class="adm-detail-title">
-            <?=$group?>
+            <?=$title?>
         </div>
 
         <div class="adm-detail-content-item-block">
             <table class="adm-detail-content-table edit-table">
                 <tbody>
-                    <?foreach ($fields as $field):?>
+                    <?foreach ($widgets as $widget):?>
 
-                        <?
-                            $widget = $field->render(1);
-                        ?>
                         <tr class="kitrix-config-field">
                             <td class="adm-detail-content-cell-l">
                                 <?=$widget->getLabel()?>
@@ -46,7 +41,7 @@
 <?else:?>
 
     <div class="kitrix-config-warning-msg">
-        Никаких настроек в группе "<?=$group?>" не найдено.
+        Никаких настроек в группе "<?=$title?>" не найдено.
     </div>
 
 <?endif;?>

@@ -6,6 +6,12 @@ use Bitrix\Main\Entity\StringField;
 
 class ValuesTable extends DataManager
 {
+    const UNIQUE_ID = 'unique_id';
+    const PID = 'pid';
+    const CODE = 'code';
+    const VALUE = 'value';
+    const DEFAULT = 'default';
+
     public static function getTableName()
     {
         return 'kitrix_config_values';
@@ -19,17 +25,19 @@ class ValuesTable extends DataManager
     public static function getMap()
     {
         return [
-            new IntegerField('id', [
+            new StringField(self::UNIQUE_ID, [
                 'primary' => true,
-                'autocomplete' => true
             ]),
-            new StringField('pid', [
+            new StringField(self::PID, [
                 'required' => true
             ]),
-            new StringField('code', [
+            new StringField(self::CODE, [
                 'required' => true
             ]),
-            new StringField('value', [
+            new StringField(self::VALUE, [
+                'required' => true
+            ]),
+            new StringField(self::DEFAULT, [
                 'required' => true
             ])
         ];

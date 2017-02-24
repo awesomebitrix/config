@@ -75,16 +75,24 @@ final class Config extends Plugin
     public function run()
     {
         $test = $this->makeField(Input::class, 'test')
-            ->setTitle('Тестовое поле');
+            ->setTitle('Тестовое поле')
+            ->setDefaultValue("default test");
 
         $cb = $this->makeField(Checkbox::class, 'cb')
             ->setTitle('Чек бокс');
 
+        $anotherTest = $this->makeField(Input::class, 'second')
+            ->setTitle('Еще одно поле для теста');
+
         $group = $this->makeGroup('Основные настройки', Config::class)
             ->addField($test)
-            ->addField($cb);
+            ->addField($cb)
+            ->addField($anotherTest);
 
         $this->registerGroup($group);
+
+        // load db fields
+        Register::getInstance()->loadFields();
     }
 
     public function registerRoutes(): array
