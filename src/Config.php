@@ -1,107 +1,109 @@
 <?php namespace Kitrix\Config;
 
 use Kitrix\Config\Admin\Field;
-use Kitrix\Config\Admin\FieldType;
+use Kitrix\Config\Admin\Group;
+use Kitrix\Config\API\Register;
 use Kitrix\Config\Fields\Checkbox;
 use Kitrix\Config\Fields\Input;
+use Kitrix\Config\ORM\ValuesTable;
 use Kitrix\MVC\Admin\RouteFactory;
 use Kitrix\Plugins\Plugin;
 
 final class Config extends Plugin
 {
-    private $_autoIncGroupId;
-    private $_autoIncFieldId;
-
-    private $registeredGroups;
-    private $registeredFields;
 
     /**
-     * Add config group
+     * Make new config field and return it
+     * All fields should be added to fieldGroup
+     * And fieldGroup should be finally registered
      *
-     * @param $title
-     * @return bool|int - return groupId if success, false - otherwise
-     */
-    public function addConfigGroup($title) {
-
-        if (!$title) {
-            return false;
-        }
-
-        $newGroupId = ++$this->_autoIncGroupId;
-        $this->registeredGroups[$newGroupId] = $title;
-        return $newGroupId;
-    }
-
-    /**
-     * Add field to config group
+     * Field -> FieldGroup -> Config::RegisterGroup
      *
-     * @param $groupId
-     * @param FieldType $fieldType
-     * @return bool|Field
+     * @param string $type  - type should be className
+     *                        of FieldType instance, example:
+     *                        Input::class,
+     *                        Checkbox::class,
+     *                        Textarea::class
+     *
+     * @param $code         - code for API. Late you can get
+     *                        field valud by this code
+     *
+     * @param string $title - title of field
+     *
+     * @return Field
      */
-    public function addConfigField($groupId, FieldType $fieldType) {
-
-        if (!$groupId) {
-            return false;
-        }
-
-        $inputId = ++$this->_autoIncFieldId;
-        $field = new Field($fieldType, $groupId, $inputId);
-        $this->registeredFields[$groupId][$inputId] = $field;
-
+    public function makeField($type, $code, $title = "")
+    {
+        $registry = Register::getInstance();
+        $field = $registry->makeField($type, $code, $title);
         return $field;
     }
 
     /**
-     * Return all fields by group and id
-     * @return mixed
+     * Make new config group and return it
+     * Fields should be added to new group.
+     * Group finally should be registered.
+     *
+     * Field -> FieldGroup -> Config::RegisterGroup
+     *
+     * @param $title        - Title of group
+     * @param $pluginId     - Class name of plugin who register
+     *                        this group. This should be
+     *                        name like this
+     *                        'MyPlugin::class',
+     *                        'Core::class',
+     * @return Group
      */
-    public function getRegisteredFields()
+    public function makeGroup($title, $pluginId)
     {
-        return $this->registeredFields;
+        $group = new Group($title, $pluginId);
+        return $group;
     }
 
     /**
-     * Return all groups
-     * @return mixed
+     * Register config group
+     *
+     * @param Group $group
+     * @return $this
      */
-    public function getRegisteredGroups()
+    public function registerGroup(Group $group)
     {
-        return $this->registeredGroups;
+        Register::getInstance()->registerGroup($group);
+        return $this;
     }
 
     public function run()
     {
-        if (false !== $coreGroup = $this->addConfigGroup('Основные настройки')) {
+        $test = $this->makeField(Input::class, 'test')
+            ->setTitle('Тестовое поле');
 
-            $this
-                ->addConfigField($coreGroup, new Input())
-                ->setTitle("Пример поля");
+        $cb = $this->makeField(Checkbox::class, 'cb')
+            ->setTitle('Чек бокс');
 
-            $this
-                ->addConfigField($coreGroup, new Checkbox())
-                ->setTitle("Использовать энергию молодости и хардкора?");
-        }
+        $group = $this->makeGroup('Основные настройки', Config::class)
+            ->addField($test)
+            ->addField($cb);
 
-        if (false !== $coreGroup2 = $this->addConfigGroup('Еще одни настройки')) {
-
-            $this
-                ->addConfigField($coreGroup2, new Input())
-                ->setTitle("Очередное поле");
-        }
+        $this->registerGroup($group);
     }
 
     public function registerRoutes(): array
     {
         $configRoutes = [];
 
-        foreach ($this->registeredGroups as $groupId => $title) {
+        // get registered groups
+        $registry = Register::getInstance();
+        foreach ($registry->getGroups() as $group) {
 
-            $configRoutes[] = RouteFactory::makeRoute('/edit/{id}', ConfigGroupController::class, "edit", [
-                'id' => (int)$groupId
-            ])
-                ->setTitle($title)
-                ->setIcon('fa-cog');
+            $configRoutes[] = RouteFactory::makeRoute(
+                '/edit/{id}/',
+                ConfigGroupController::class,
+                'edit', [
+                    'id' => $group->getGroupId()
+                ]
+            )
+                ->setTitle($group->getTitle())
+                ->setIcon('fa-tag');
         }
 
         $configRoutes[] = RouteFactory::makeRoute('/list/', SiteConfigController::class, 'configList')
@@ -109,5 +111,18 @@ final class Config extends Plugin
             ->setIcon('fa-tags');
 
         return $configRoutes;
+    }
+
+    public static function onInstall()
+    {
+        ValuesTable::getEntity()->createDbTable();
+    }
+
+    public static function onUninstall()
+    {
+        global $DB;
+
+        $dropValuesTableQuery = vsprintf("DROP TABLE %s", [ValuesTable::getTableName()]);
+        $DB->Query($dropValuesTableQuery);
     }
 }

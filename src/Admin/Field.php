@@ -5,20 +5,16 @@ final class Field
     /** @var FieldType */
     private $type;
 
-    /** @var int  */
-    private $id = 0;
-
-    /** @var int  */
-    private $groupId = 0;
+    /** @var string  */
+    private $code = "";
 
     /** @var string */
     private $title = "Default input";
 
-    function __construct(FieldType $type, $groupId, $id)
+    function __construct(FieldType $type, $code)
     {
         $this->type = $type;
-        $this->groupId = $groupId;
-        $this->id = $id;
+        $this->code = $code;
     }
 
     /**
@@ -27,6 +23,7 @@ final class Field
      * {name} - system name for field
      * {title} - title for field
      *
+     * @param $dbValue
      * @return FieldRepresentation
      */
     final public function render($dbValue) {
@@ -35,7 +32,7 @@ final class Field
         $htmlWidget = $this->type->renderWidget($value);
         $htmlLabel = $this->type->renderLabel();
 
-        $inputId = "ktrx_config_" .$this->getGroupId() . "_" . $this->getId();
+        $inputId = "ktrx_config_" .$this->getPluginId() . "_" . $this->getCode();
 
         $template = [
             "{id}" => $inputId,
@@ -52,17 +49,9 @@ final class Field
     /**
      * @return int
      */
-    public function getGroupId(): int
+    public function getCode(): int
     {
-        return $this->groupId;
-    }
-
-    /**
-     * @return int
-     */
-    public function getId(): int
-    {
-        return $this->id;
+        return $this->code;
     }
 
     /**
@@ -83,9 +72,11 @@ final class Field
 
     /**
      * @param string $title
+     * @return $this
      */
     public function setTitle(string $title)
     {
         $this->title = $title;
+        return $this;
     }
 }
