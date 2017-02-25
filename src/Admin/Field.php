@@ -29,17 +29,15 @@ final class Field
      * @param $dbValue
      * @return FieldRepresentation
      */
-    final public function render($dbValue) {
+    final public function render($dbValue, $uniqId) {
 
         $value = $this->type->unserialize($dbValue);
         $htmlWidget = $this->type->renderWidget($value);
         $htmlLabel = $this->type->renderLabel();
 
-        $inputId = "ktrx" . "_" . $this->getCode();
-
         $template = [
-            "{id}" => $inputId,
-            "{name}" => $inputId,
+            "{id}" => "ktrx_field_" . $uniqId,
+            "{name}" => $uniqId,
             "{title}" => $this->getTitle()
         ];
 

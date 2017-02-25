@@ -140,12 +140,14 @@ class Register
     /**
      * Return field values from DB
      *
+     * @param bool $useCache
      * @return array
      */
-    public function loadFields(): array
+    public function loadFields($useCache = true): array
     {
-        if (!count($this->_fieldsCache))
+        if (!count($this->_fieldsCache) OR !$useCache)
         {
+            $this->_fieldsCache = [];
             $fields = ValuesTable::getList();
 
             while ($f = $fields->fetch())

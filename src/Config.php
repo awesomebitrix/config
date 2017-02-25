@@ -1,5 +1,6 @@
 <?php namespace Kitrix\Config;
 
+use Kitrix\Common\Kitx;
 use Kitrix\Config\Admin\Field;
 use Kitrix\Config\Admin\Group;
 use Kitrix\Config\API\Register;
@@ -84,12 +85,25 @@ final class Config extends Plugin
         $anotherTest = $this->makeField(Input::class, 'second')
             ->setTitle('Еще одно поле для теста');
 
+        $someMessage = $this->makeField(Input::class, 'LOLTEST1')
+            ->setTitle('lol test')
+            ->setDefaultValue('hello!');
+
         $group = $this->makeGroup('Основные настройки', Config::class)
             ->addField($test)
             ->addField($cb)
-            ->addField($anotherTest);
+            ->addField($anotherTest)
+            ->addField($someMessage);
 
-        $this->registerGroup($group);
+        $group2 = $this->makeGroup('2 настройки', Config::class)
+            ->addField($test);
+
+        Kitx::fire($group);
+        Kitx::fire($group2);
+
+        $this
+            ->registerGroup($group)
+            ->registerGroup($group2);
 
         // load db fields
         Register::getInstance()->loadFields();

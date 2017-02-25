@@ -33,10 +33,11 @@ class Group
         $namespaces = explode('\\', $ref->getNamespaceName());
         $vendor = array_shift($namespaces);
 
+        $groupUniqId = substr(sha1($title),0,4);
 
         $this->title = $title ?: $ref->getShortName();
         $this->pluginId = $pluginClassName;
-        $this->groupId = strtolower($vendor."_".$ref->getShortName());
+        $this->groupId = strtolower($vendor."_".$ref->getShortName()."_".$groupUniqId);
     }
 
 

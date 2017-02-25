@@ -22,7 +22,7 @@ abstract class FieldType
 
         ob_start();
         ?>
-        <input type="text" id="{id}" value="<?=$value?>">
+        <input type="text" id="{id}" name="{name}" value="<?=$value?>">
         <?
         return ob_get_clean();
     }

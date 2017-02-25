@@ -1,47 +1,68 @@
 <?
 /**
  * @var array $result
+ * @var string $post_url
+ * @var \CAdminMessage $error
  */
 
 $title = $result['title'];
 /** @var \Kitrix\Config\Admin\FieldRepresentation[] $widgets */
 $widgets = $result['widgets'];
-
 ?>
 
-<?if(count($widgets)):?>
+<?/** =============== BITRIX CODE ==================== */?>
 
-    <div class="adm-detail-content">
+<form method="POST" Action="<?=$post_url?>" ENCTYPE="multipart/form-data" name="post_form">
 
-        <div class="adm-detail-title">
-            <?=$title?>
-        </div>
+    <?=bitrix_sessid_post();?>
 
-        <div class="adm-detail-content-item-block">
-            <table class="adm-detail-content-table edit-table">
-                <tbody>
-                    <?foreach ($widgets as $widget):?>
+    <?
+    // prepare tabs
+    $tabControl = new CAdminTabControl("tabControl", [
+        [
+            "DIV" => "edit",
+            "TAB" => $title,
+            "TITLE"=>$title,
+            "ICON"=>"main_user_edit",
+        ]
+    ]);
 
-                        <tr class="kitrix-config-field">
-                            <td class="adm-detail-content-cell-l">
-                                <?=$widget->getLabel()?>
-                            </td>
-                            <td class="adm-detail-content-cell-r">
-                                <?=$widget->getWidget()?>
-                            </td>
-                        </tr>
+    $tabControl->Begin();
+    $tabControl->BeginNextTab();
+    ?>
 
-                    <?endforeach;?>
-                </tbody>
-            </table>
-        </div>
+    <?if(count($widgets)):?>
+        <?foreach ($widgets as $widget):?>
+            <tr>
+                <td>
+                    <?=$widget->getLabel()?>
+                </td>
+                <td>
+                    <?=$widget->getWidget()?>
+                </td>
+            </tr>
+        <?endforeach;?>
+    <?else:?>
+        <tr>
+            <td>
+                <div class="kitrix-config-warning-msg">
+                    Никаких настроек в группе "<?=$title?>" не найдено.
+                </div>
+            </td>
+        </tr>
+    <?endif;?>
 
-    </div>
+    <?
+    $tabControl->Buttons(
+        array(
+            "btnCancel" => false,
+            "btnApply" => false
+        )
+    );
+    $tabControl->End();
+    $tabControl->ShowWarnings("post_form", $error);
 
-<?else:?>
+    ?>
 
-    <div class="kitrix-config-warning-msg">
-        Никаких настроек в группе "<?=$title?>" не найдено.
-    </div>
+</form>
 
-<?endif;?>

@@ -18,7 +18,7 @@ final class Checkbox extends FieldType
     {
         ob_start();
         ?>
-            <input id="{id}" name="{name}" type="checkbox" <?=$value ? "checked" : ""?> title="{title}">
+            <input id="{id}" name="{name}" type="checkbox" value="Y" <?=$value ? "checked" : ""?> title="{title}">
         <?
         return ob_get_clean();
     }
