@@ -12,6 +12,17 @@
 
 namespace Kitrix\Config\Fields;
 
+use Kitrix\Config\Admin\FieldRepresentation;
 use Kitrix\Config\Admin\FieldType;
 
-final class Input extends FieldType{}
+final class Textarea extends FieldType
+{
+    public function renderWidget($value, $vars)
+    {
+        ob_start();
+        ?>
+        <textarea <?=$vars[FieldRepresentation::ATTR_ATTRIBUTES_LINE]?>><?=$value ? $value : ""?></textarea>
+        <?
+        return ob_get_clean();
+    }
+}

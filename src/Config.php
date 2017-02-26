@@ -1,109 +1,62 @@
-<?php namespace Kitrix\Config;
+<?php
+/******************************************************************************
+ * Copyright (c) 2017. Kitrix Team                                            *
+ * Kitrix is open source project, available under MIT license.                *
+ *                                                                            *
+ * @author: Konstantin Perov <fe3dback@yandex.ru>                             *
+ * Documentation:                                                             *
+ * @see https://kitrix-org.github.io/docs                                     *
+ *                                                                            *
+ *                                                                            *
+ ******************************************************************************/
 
-use Kitrix\Common\Kitx;
-use Kitrix\Config\Admin\Field;
-use Kitrix\Config\Admin\Group;
+namespace Kitrix\Config;
+
 use Kitrix\Config\API\Register;
 use Kitrix\Config\Fields\Checkbox;
 use Kitrix\Config\Fields\Input;
+use Kitrix\Config\Fields\Textarea;
 use Kitrix\Config\ORM\ValuesTable;
 use Kitrix\MVC\Admin\RouteFactory;
 use Kitrix\Plugins\Plugin;
 
 final class Config extends Plugin
 {
-
-    /**
-     * Make new config field and return it
-     * All fields should be added to fieldGroup
-     * And fieldGroup should be finally registered
-     *
-     * Field -> FieldGroup -> Config::RegisterGroup
-     *
-     * @param string $type  - type should be className
-     *                        of FieldType instance, example:
-     *                        Input::class,
-     *                        Checkbox::class,
-     *                        Textarea::class
-     *
-     * @param $code         - code for API. Late you can get
-     *                        field valud by this code
-     *
-     * @param string $title - title of field
-     *
-     * @return Field
-     */
-    public function makeField($type, $code, $title = "")
-    {
-        $registry = Register::getInstance();
-        $field = $registry->makeField($type, $code, $title);
-        return $field;
-    }
-
-    /**
-     * Make new config group and return it
-     * Fields should be added to new group.
-     * Group finally should be registered.
-     *
-     * Field -> FieldGroup -> Config::RegisterGroup
-     *
-     * @param $title        - Title of group
-     * @param $pluginId     - Class name of plugin who register
-     *                        this group. This should be
-     *                        name like this
-     *                        'MyPlugin::class',
-     *                        'Core::class',
-     * @return Group
-     */
-    public function makeGroup($title, $pluginId)
-    {
-        $group = new Group($title, $pluginId);
-        return $group;
-    }
-
-    /**
-     * Register config group
-     *
-     * @param Group $group
-     * @return $this
-     */
-    public function registerGroup(Group $group)
-    {
-        Register::getInstance()->registerGroup($group);
-        return $this;
-    }
-
     public function run()
     {
-        $test = $this->makeField(Input::class, 'test')
+        $test = ConfRegistry::makeField(Input::class, 'test')
             ->setTitle('Тестовое поле')
-            ->setDefaultValue("default test");
+            ->setDefaultValue("default test")
+            ->setDisabled(true);
 
-        $cb = $this->makeField(Checkbox::class, 'cb')
-            ->setTitle('Чек бокс');
+        $cb = ConfRegistry::makeField(Checkbox::class, 'cb')
+            ->setTitle('Чек бокс')
+            ->setHelpText("<b>Important!</b>: this is example of help message..");
 
-        $anotherTest = $this->makeField(Input::class, 'second')
-            ->setTitle('Еще одно поле для теста');
+        $anotherTest = ConfRegistry::makeField(Input::class, 'second')
+            ->setTitle('Еще одно поле для теста')
+            ->setHidden(true);
 
-        $someMessage = $this->makeField(Input::class, 'LOLTEST1')
+        $someMessage = ConfRegistry::makeField(Input::class, 'LOLTEST1')
             ->setTitle('lol test')
-            ->setDefaultValue('hello!');
+            ->setDefaultValue('hello!')
+            ->setReadonly(true);
 
-        $group = $this->makeGroup('Основные настройки', Config::class)
+        $group = ConfRegistry::makeGroup('Основные настройки', Config::class)
             ->addField($test)
             ->addField($cb)
             ->addField($anotherTest)
-            ->addField($someMessage);
+            ->addField($someMessage)
+            ->addField(
+                ConfRegistry::makeField(Textarea::class, 'text')
+                    ->setTitle("text area")
+            );
 
-        $group2 = $this->makeGroup('2 настройки', Config::class)
+        $group2 = ConfRegistry::makeGroup('2 настройки', Config::class)
             ->addField($test);
 
-        Kitx::fire($group);
-        Kitx::fire($group2);
-
-        $this
-            ->registerGroup($group)
-            ->registerGroup($group2);
+        ConfRegistry::registerGroup($group);
+        ConfRegistry::registerGroup($group2);
 
         // load db fields
         Register::getInstance()->loadFields();

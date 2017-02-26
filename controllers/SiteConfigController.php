@@ -6,7 +6,8 @@ class SiteConfigController extends Controller
 {
     public function configList()
     {
-
+        $helloWorld = ConfRegistry::getValue(Config::class, 'text');
+        $this->set('message', $helloWorld);
     }
 
 }

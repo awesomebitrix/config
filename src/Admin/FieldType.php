@@ -1,48 +1,56 @@
-<?php namespace Kitrix\Config\Admin;
+<?php
+/******************************************************************************
+ * Copyright (c) 2017. Kitrix Team                                            *
+ * Kitrix is open source project, available under MIT license.                *
+ *                                                                            *
+ * @author: Konstantin Perov <fe3dback@yandex.ru>                             *
+ * Documentation:                                                             *
+ * @see https://kitrix-org.github.io/docs                                     *
+ *                                                                            *
+ *                                                                            *
+ ******************************************************************************/
+
+namespace Kitrix\Config\Admin;
 
 abstract class FieldType
 {
 
     /**
      * Function should return valid html code of input.
-     * You should use variable placeholder for input:
-     *
-     * {id} - id for field (can be used in field,label,etc..)
-     * {name} - system name for field
-     * {title} - title for field
-     *
-     * example:
-     * <label for="{id}">{title}</label>
-     * <input id="{id}" name="{name}">
+     * You can use vars with primary field attributes, like id, name, class and etc..
      *
      * @param $value - value from db after unserialize
+     * @param $vars - other field attributes
      * @return string
      */
-    public function renderWidget($value) {
+    public function renderWidget($value, $vars) {
 
         ob_start();
         ?>
-        <input type="text" id="{id}" name="{name}" value="<?=$value?>">
+        <input
+            <?=$vars[FieldRepresentation::ATTR_ATTRIBUTES_LINE]?>
+            type="text"
+            value="<?=$value?>"
+        >
         <?
         return ob_get_clean();
     }
 
     /**
-     * Function should return any
-     * template of widget title
+     * Function should return valid html code of input.
+     * You can use vars with primary field attributes, like id, name, class and etc..
      *
-     * You can use template:
-     * {id} - id for field (can be used in field,label,etc..)
-     * {name} - system name for field
-     * {title} - title for field
-     *
+     * @param $value - value from db after unserialize
+     * @param $vars - other field attributes
      * @return string
      */
-    public function renderLabel() {
+    public function renderLabel($value, $vars) {
 
         ob_start();
         ?>
-        <label for="{id}">{title}</label>
+        <label for="<?=$vars['id']?>">
+            <?=$vars['title']?>
+        </label>
         <?
         return ob_get_clean();
     }

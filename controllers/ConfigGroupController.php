@@ -37,32 +37,9 @@ class ConfigGroupController extends Controller
 
         if ($_REQUEST['save'])
         {
-            foreach ($fields as $field)
-            {
-                $uniqId = $registry->getUniqueIdFromField($group, $field);
-
-                if (in_array($uniqId, array_keys($_REQUEST))) {
-
-                    $value = $_REQUEST[$uniqId];
-                    if ($field->getType() instanceof Checkbox)
-                    {
-                        $value = (bool)($value === 'Y' ? true : false);
-                    }
-                }
-                else
-                {
-                    $value = 0;
-                }
-
-                // update row in db
-                $status = ValuesTable::update($uniqId, [
-                    ValuesTable::VALUE => $value
-                ]);
-                if (!$status->isSuccess())
-                {
-                    $messages = $status->getErrorMessages();
-                    break;
-                }
+            $status = $registry->updateValues($group, $_REQUEST);
+            if (!$status->isSuccess()) {
+                $messages = $status->getErrorMessages();
             }
         }
 
@@ -81,7 +58,11 @@ class ConfigGroupController extends Controller
             /** @var Field $field */
 
             $uniqId = $registry->getUniqueIdFromField($group, $field);
-            $setting = $dbValues[$uniqId] ?: 0;
+            $setting = $dbValues[$uniqId] ?: false;
+
+            if (!$setting) {
+                continue;
+            }
 
             $widget = $field->render($setting[ValuesTable::VALUE], $uniqId);
             $result['widgets'][] = $widget;

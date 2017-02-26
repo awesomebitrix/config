@@ -1,4 +1,16 @@
-<?php namespace Kitrix\Config\ORM;
+<?php
+/******************************************************************************
+ * Copyright (c) 2017. Kitrix Team                                            *
+ * Kitrix is open source project, available under MIT license.                *
+ *                                                                            *
+ * @author: Konstantin Perov <fe3dback@yandex.ru>                             *
+ * Documentation:                                                             *
+ * @see https://kitrix-org.github.io/docs                                     *
+ *                                                                            *
+ *                                                                            *
+ ******************************************************************************/
+
+namespace Kitrix\Config\ORM;
 
 use Bitrix\Main\Entity\DataManager;
 use Bitrix\Main\Entity\IntegerField;
