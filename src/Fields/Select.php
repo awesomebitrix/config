@@ -15,16 +15,22 @@ namespace Kitrix\Config\Fields;
 use Kitrix\Config\Admin\FieldRepresentation;
 use Kitrix\Config\Admin\FieldType;
 
-final class Textarea extends FieldType
+final class Select extends FieldType
 {
     public function renderWidget($value, $vars)
     {
+        $options = $vars[FieldRepresentation::ATTR_OPTIONS];
+        if (!count($options)) {
+            $options[] = "Нет вариантов для выбора";
+        }
+
         ob_start();
         ?>
-        <textarea
-            <?=$vars[FieldRepresentation::ATTR_ATTRIBUTES_LINE]?>
-            style="min-height: 100px;max-height: 500px;width: 100%;max-width: 600px"
-            ><?=$value ? $value : ""?> </textarea>
+            <select <?=$vars[FieldRepresentation::ATTR_ATTRIBUTES_LINE]?>>
+                <?foreach ($options as $id => $title):?>
+                    <option value="<?=$id?>" <?=($value === $id) ? "selected" : ""?>><?=$title?></option>
+                <?endforeach;?>
+            </select>
         <?
         return ob_get_clean();
     }

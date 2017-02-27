@@ -15,6 +15,7 @@ namespace Kitrix\Config;
 use Kitrix\Config\API\Register;
 use Kitrix\Config\Fields\Checkbox;
 use Kitrix\Config\Fields\Input;
+use Kitrix\Config\Fields\Select;
 use Kitrix\Config\Fields\Textarea;
 use Kitrix\Config\ORM\ValuesTable;
 use Kitrix\MVC\Admin\RouteFactory;
@@ -50,6 +51,12 @@ final class Config extends Plugin
             ->addField(
                 ConfRegistry::makeField(Textarea::class, 'text')
                     ->setTitle("text area")
+            )
+            ->addField(
+                ConfRegistry::makeField(Select::class, 'select_test')
+                    ->setTitle("Пример селекта")
+                    ->setDefaultValue(0)
+                    ->setOptions(["world" => "Hello world", "shit" => "Bitrix"])
             );
 
         $group2 = ConfRegistry::makeGroup('2 настройки', Config::class)

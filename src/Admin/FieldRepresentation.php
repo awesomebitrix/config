@@ -25,6 +25,7 @@ final class FieldRepresentation
     const ATTR_VALUE = "value";
     const ATTR_VALUE_ORIGINAL = "value_original";
     const ATTR_ATTRIBUTES_LINE = "attributes";
+    const ATTR_OPTIONS = "options";
 
     /** @var string */
     private $widget = "";

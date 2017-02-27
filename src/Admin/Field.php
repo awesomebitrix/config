@@ -12,6 +12,8 @@
 
 namespace Kitrix\Config\Admin;
 
+use Kitrix\Config\Fields\Select;
+
 final class Field
 {
     /** @var FieldType */
@@ -38,6 +40,9 @@ final class Field
     /** @var mixed */
     private $defaultValue = 0;
 
+    /** @var array  */
+    private $options = [];
+
     function __construct(FieldType $type, $code)
     {
         $this->type = $type;
@@ -58,6 +63,12 @@ final class Field
 
         $value = $this->type->unserialize($dbValue);
 
+        // disable field
+        if (($this->getType() instanceof Select) && !count($this->getOptions()))
+        {
+            $this->setDisabled(true);
+        }
+
         $vars = [
             FieldRepresentation::ATTR_ID => "ktrx_field_" . $uniqId,
             FieldRepresentation::ATTR_NAME => $uniqId,
@@ -67,7 +78,8 @@ final class Field
             FieldRepresentation::ATTR_HIDDEN => $this->isHidden(),
             FieldRepresentation::ATTR_READ_ONLY => $this->isReadonly(),
             FieldRepresentation::ATTR_VALUE => $value,
-            FieldRepresentation::ATTR_VALUE_ORIGINAL => $dbValue
+            FieldRepresentation::ATTR_VALUE_ORIGINAL => $dbValue,
+            FieldRepresentation::ATTR_OPTIONS => $this->getOptions()
         ];
 
         $attributes = [
@@ -163,6 +175,14 @@ final class Field
     }
 
     /**
+     * @return array
+     */
+    public function getOptions(): array
+    {
+        return $this->options;
+    }
+
+    /**
      * @return bool
      */
     public function isReadonly(): bool
@@ -227,6 +247,16 @@ final class Field
     public function setReadonly(bool $readonly)
     {
         $this->readonly = $readonly;
+        return $this;
+    }
+
+    /**
+     * @param array $options
+     * @return $this
+     */
+    public function setOptions(array $options)
+    {
+        $this->options = $options;
         return $this;
     }
 
