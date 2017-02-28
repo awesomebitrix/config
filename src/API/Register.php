@@ -12,6 +12,7 @@
 
 namespace Kitrix\Config\API;
 
+use Bitrix\Main\Result;
 use Kitrix\Common\Kitx;
 use Kitrix\Common\SingletonClass;
 use Kitrix\Config\Admin\Field;
@@ -193,12 +194,12 @@ class Register
      *
      * @param Group $group
      * @param array $updateData
-     * @return \Bitrix\Main\Entity\UpdateResult|bool
+     * @return Result
      */
     public function updateValues(Group $group, $updateData = [])
     {
         $fields = $group->getFields();
-        $status = true;
+        $result = new Result();
 
         foreach ($fields as $field)
         {
@@ -226,11 +227,12 @@ class Register
                 ValuesTable::VALUE => $value
             ]);
             if (!$status->isSuccess()) {
+                $result->addErrors($status->getErrors());
                 break;
             }
         }
 
-        return $status;
+        return $result;
     }
 
     /**
@@ -269,6 +271,80 @@ class Register
         $searchableValue = null;
         $values = $this->loadFields(true);
 
+        $valueUniqId = $this->getUniqueKey($pluginId, $fieldCode);
+        $field = $this->getField($pluginId, $fieldCode);
+
+        if (!($valueUniqId && $field))
+        {
+            return null;
+        }
+
+        if (in_array($valueUniqId, array_keys($values)))
+        {
+            $_dbVal = $values[$valueUniqId][ValuesTable::VALUE];
+            $searchableValue = $field->getType()->unserialize($_dbVal);
+        }
+
+        if (!is_null($searchableValue))
+        {
+            $this->_valuesCache[$_cacheKey] = $searchableValue;
+        }
+
+        return $searchableValue;
+    }
+
+    /**
+     * Set field value programmatically
+     * to any mixed data. This data
+     * will be serialized by field method
+     * and finally saved to DB
+     *
+     * @param $pluginId
+     * @param $fieldCode
+     * @param $value
+     * @return bool - true if success, false otherwise
+     */
+    public function setValue($pluginId, $fieldCode, $value)
+    {
+        $oldValue = $this->getValue($pluginId, $fieldCode);
+
+        if ($oldValue === null)
+        {
+            return false;
+        }
+
+        if (false === ($field = $this->getField($pluginId, $fieldCode)))
+        {
+            return false;
+        }
+
+        $fieldUniqId = $this->getUniqueKey($pluginId, $fieldCode);
+        $dbValue = $field->getType()->serialize($value);
+
+        // update in db
+        $result = $this->updateValueField($fieldUniqId, [
+            ValuesTable::VALUE => $dbValue
+        ]);
+
+        // clear cache
+        $this->_valuesCache = [];
+        $this->_fieldsCache = [];
+
+        return $result->isSuccess();
+    }
+
+    /**
+     * Get unique field key by plugin and fieldCode
+     * Actual key used in database as primary key
+     *
+     * @param $pluginId
+     * @param $fieldCode
+     * @return bool|string - return false if field not found
+     */
+    public function getUniqueKey($pluginId, $fieldCode)
+    {
+        $key = false;
+
         foreach ($this->getGroups() as $group)
         {
             if ($group->getPluginId() !== $pluginId)
@@ -283,20 +359,41 @@ class Register
                     continue;
                 }
 
-                $valueUniqId = $this->getUniqueIdFromField($group, $field);
-                if (in_array($valueUniqId, array_keys($values)))
-                {
-                    $_dbVal = $values[$valueUniqId][ValuesTable::VALUE];
-                    $searchableValue = $field->getType()->unserialize($_dbVal);
-                }
+                $key = $this->getUniqueIdFromField($group, $field);
             }
         }
 
-        if (!is_null($searchableValue))
+        return $key;
+    }
+
+    /**
+     * Get field object by pluginId and fieldCode
+     * or false if field not found
+     *
+     * @param $pluginId
+     * @param $fieldCode
+     * @return bool|Field
+     */
+    public function getField($pluginId, $fieldCode)
+    {
+        foreach ($this->getGroups() as $group)
         {
-            $this->_valuesCache[$_cacheKey] = $searchableValue;
+            if ($group->getPluginId() !== $pluginId)
+            {
+                continue;
+            }
+
+            foreach ($group->getFields() as $field)
+            {
+                if ($field->getCode() !== $fieldCode)
+                {
+                    continue;
+                }
+
+                return $field;
+            }
         }
 
-        return $searchableValue;
+        return false;
     }
 }

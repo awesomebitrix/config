@@ -23,7 +23,7 @@ use Kitrix\Plugins\Plugin;
 
 final class Config extends Plugin
 {
-    public function run()
+    public function run2()
     {
         $test = ConfRegistry::makeField(Input::class, 'test')
             ->setTitle('Тестовое поле')

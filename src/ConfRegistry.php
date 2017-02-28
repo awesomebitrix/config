@@ -4,7 +4,13 @@ use Kitrix\Config\Admin\Field;
 use Kitrix\Config\Admin\Group;
 use Kitrix\Config\API\Register;
 
-class ConfRegistry
+/**
+ * This is clear API wrapper of registry
+ *
+ * Class ConfRegistry
+ * @package Kitrix\Config
+ */
+final class ConfRegistry
 {
     /**
      * Make new config field and return it
@@ -72,6 +78,8 @@ class ConfRegistry
      * Method use cache, so you can free to use
      * function in any loops. This is fast.
      *
+     * Return null, if value not exist
+     *
      * @param $pluginId
      * @param $fieldCode
      * @return mixed|null
@@ -79,5 +87,21 @@ class ConfRegistry
     public static function getValue($pluginId, $fieldCode)
     {
         return Register::getInstance()->getValue($pluginId, $fieldCode);
+    }
+
+    /**
+     * Set field value programmatically
+     * to any mixed data. This data
+     * will be serialized by field method
+     * and finally saved to DB
+     *
+     * @param $pluginId
+     * @param $fieldCode
+     * @param $value
+     * @return bool - true if success, false otherwise
+     */
+    public static function setValue($pluginId, $fieldCode, $value)
+    {
+        return Register::getInstance()->setValue($pluginId, $fieldCode, $value);
     }
 }
