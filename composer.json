@@ -20,6 +20,6 @@
     },
     "minimum-stability": "dev",
     "require": {
-        "kitrix/core": "*"
+        "kitrix/installer": "*"
     }
 }
