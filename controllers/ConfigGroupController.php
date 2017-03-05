@@ -1,6 +1,7 @@
 <?php namespace Kitrix\Config;
 
 use Kitrix\Config\Admin\Field;
+use Kitrix\Config\Admin\FormHelper;
 use Kitrix\Config\API\Register;
 use Kitrix\Config\Fields\Checkbox;
 use Kitrix\Config\ORM\ValuesTable;
@@ -21,7 +22,6 @@ class ConfigGroupController extends Controller
         }
 
         $group = $groups[$id];
-        $fields = $group->getFields();
 
         // prepare
         // ---------------
@@ -51,22 +51,7 @@ class ConfigGroupController extends Controller
 
         // render
         // ---------------
-        $dbValues = $registry->loadFields(false);
-
-        foreach ($fields as $field) {
-
-            /** @var Field $field */
-
-            $uniqId = $registry->getUniqueIdFromField($group, $field);
-            $setting = $dbValues[$uniqId] ?: false;
-
-            if (!$setting) {
-                continue;
-            }
-
-            $widget = $field->render($setting[ValuesTable::VALUE], $uniqId);
-            $result['widgets'][] = $widget;
-        }
+        $result['widgets'] = FormHelper::getWidgets($group);
 
         $this->set('result', $result);
         $this->set('post_url', Router::getInstance()->generateLinkTo('kitrix_config_edit_{id}', [

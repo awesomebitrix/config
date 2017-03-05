@@ -5,7 +5,7 @@
  * @var \CAdminMessage $error
  */
 
-use Kitrix\Config\Admin\FieldRepresentation;
+use Kitrix\Config\Admin\FormHelper;
 
 $title = $result['title'];
 /** @var \Kitrix\Config\Admin\FieldRepresentation[] $widgets */
@@ -34,35 +34,7 @@ $widgets = $result['widgets'];
     ?>
 
     <?if(count($widgets)):?>
-        <?foreach ($widgets as $widget):?>
-            <?
-            $hidden = !!$widget->getVar(FieldRepresentation::ATTR_HIDDEN);
-            $help = $widget->getVar(FieldRepresentation::ATTR_HELP);
-            $readOnly = !!$widget->getVar(FieldRepresentation::ATTR_READ_ONLY);
-            $value = $widget->getVar(FieldRepresentation::ATTR_VALUE)
-            ?>
-            <tr <?=$hidden ? "style='display:none;'" : ""?>>
-                <td style="vertical-align: top;">
-                    <?=$widget->getLabel()?>
-                </td>
-                <td>
-                    <?if(!$readOnly):?>
-                        <?=$widget->getWidget()?>
-
-                        <?if($help):?>
-                            <div class="adm-info-message-wrap">
-                                <div class="adm-info-message">
-                                    <?=$help?>
-                                </div>
-                            </div>
-                        <?endif;?>
-                    <?else:?>
-                        <?=$value?>
-                    <?endif;?>
-
-                </td>
-            </tr>
-        <?endforeach;?>
+        <? FormHelper::renderForm($widgets)?>
     <?else:?>
         <tr>
             <td>
